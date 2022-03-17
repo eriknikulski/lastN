@@ -1,9 +1,9 @@
 const ACCESS_URL = 'https://accounts.spotify.com/api/token';
 const AUTH_URL = 'https://accounts.spotify.com/authorize';
 const CURRENT_URL = location.protocol + '//' + location.host + location.pathname;
-const CLIENT_ID = '';
-const CLIENT = '';
-const PERMISSIONS = 'user-library-read';
+const CLIENT_ID = 'b4e79ccabba04ce19169209aa148a63b';
+const CLIENT = '80f295d2d74442c8bdbbcee18e265990';
+const PERMISSIONS = 'user-library-read playlist-modify-public';
 
 
 const getURLParams = () => {
