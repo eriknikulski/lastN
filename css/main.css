@@ -2,7 +2,7 @@ html, body {
     height: 100%
 }
 
-#login-btn {
+.btn {
     background-color: #1DB954;
     border: none;
     color: white;
@@ -24,5 +24,13 @@ html, body {
 }
 
 .post-login {
+    display: none;
+}
+
+.message {
+    display: none;
+}
+
+#create-btn {
     display: none;
 }
