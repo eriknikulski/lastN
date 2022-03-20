@@ -20,7 +20,14 @@ html, body {
     display: flex;
     justify-content: center;
     align-items: center;
+    flex-direction: column;
     height: 100%;
+    font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
+}
+
+.headline {
+    font-size: 2rem;
+    padding: 40px;
 }
 
 .post-login {
@@ -29,8 +36,14 @@ html, body {
 
 .message {
     display: none;
+    font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
+    padding: 10px;
 }
 
 #create-btn {
+    display: none;
+}
+
+#refresh-btn {
     display: none;
 }

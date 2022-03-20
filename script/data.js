@@ -21,10 +21,10 @@ const getUserID = () => {
     .catch(console.error);
 }
 
-const getSavedTracks = (n, url=buildURL(SPOTIFY_SAVED_TRACKS, {'limit': N}), acc=[]) => {
+const getSavedTracks = (n, url=buildURL(SPOTIFY_SAVED_TRACKS, {'limit': N})) => {
   return fetch(url, getOptions())
     .then(response => response.json())
-    .then(content => acc.concat(content.items))
+    .then(content => content.items)
     .catch(console.error);
 }
 
@@ -34,8 +34,15 @@ const getPlaylists = () => {
     .catch(console.error);
 }
 
+const getPlaylistTracks = (playlistID) => {
+  return fetch(SPOTIFY_BASE_API + `/playlists/${playlistID}`, getOptions())
+    .then(response => response.json())
+    .then(content => content.tracks.items)
+    .catch(console.error);
+}
+
 const checkIfNameExists = (playlists, name=NAME) => {
-  return playlists.map(playlist => playlist.name).includes(name);
+  return playlists.find(playlist => playlist.name === name);
 }
 
 const createPlaylist = (userID, name=NAME, description='', isPublic=true) => {
@@ -74,17 +81,49 @@ const addTracksToPlaylist = (playlistID, tracks) => {
     .catch(console.error);
 }
 
+const emptyPlaylist = (playlistID, tracks) => {
+  const options = {
+    method: 'DELETE',
+    body: JSON.stringify({
+      uris: tracks.map(track => track.track.uri),
+    }),
+    headers: {
+      'Authorization': 'Bearer ' + getCookie('access_token'),
+      'Content-Type': 'application/json'
+    }
+  };
+  return fetch(SPOTIFY_BASE_API + `/playlists/${playlistID}/tracks`, options)
+    .then(response => response.json())
+    .then(content => content.snapshot_id)
+    .catch(console.error);
+}
+
 const checkExistence = () => {
   getPlaylists()
     .then(content => checkIfNameExists(content.items))
-    .then(exists => {
-      if (exists) {
+    .then(playlist => {
+      if (playlist) {
         document.querySelector('.message').innerHTML = 'Playlist already exists!';
         document.querySelector('.message').style.display = 'block';
+
+        document.getElementById('refresh-btn').addEventListener('click', () => refresh(playlist.id));
+        document.querySelector('#refresh-btn').style.display = 'block';
       } else {
         document.querySelector('#create-btn').style.display = 'block';
         document.getElementById('create-btn').addEventListener('click', buildLastN);
       }
+    });
+}
+
+const refresh = (playlistID) => {
+  getPlaylistTracks(playlistID)
+    .then(tracks => emptyPlaylist(playlistID, tracks))
+    .then(() => getSavedTracks(N))
+    .then(tracks => addTracksToPlaylist(playlistID, tracks))
+    .then(() => {
+      document.querySelector('.message').innerHTML = 'Playlist is up to date!';
+      document.querySelector('#refresh-btn').style.display = 'none';
+      document.querySelector('.message').style.display = 'block';
     });
 }
 
