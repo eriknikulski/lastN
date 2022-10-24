@@ -60,7 +60,6 @@ const createPlaylist = (userID, name=NAME, description='', isPublic=true) => {
   };
   return fetch(SPOTIFY_BASE_API + `/users/${userID}/playlists`, options)
     .then(response => response.json())
-    .then(content => content.id)
     .catch(console.error);
 }
 
@@ -77,7 +76,6 @@ const addTracksToPlaylist = (playlistID, tracks) => {
   };
   return fetch(SPOTIFY_BASE_API + `/playlists/${playlistID}/tracks`, options)
     .then(response => response.json())
-    .then(content => content.snapshot_id)
     .catch(console.error);
 }
 
@@ -103,8 +101,8 @@ const checkExistence = () => {
     .then(content => checkIfNameExists(content.items))
     .then(playlist => {
       if (playlist) {
-        document.querySelector('.message').innerHTML = 'Playlist already exists!';
-        document.querySelector('.message').style.display = 'block';
+        document.querySelector('.message .text-field').innerHTML = 'Playlist already exists!';
+        showURL(playlist.external_urls.spotify);
 
         document.getElementById('refresh-btn').addEventListener('click', () => refresh(playlist.id));
         document.querySelector('#refresh-btn').style.display = 'block';
@@ -130,10 +128,20 @@ const refresh = (playlistID) => {
 const buildLastN = () => {
   getUserID()
     .then(userID => Promise.all([createPlaylist(userID), getSavedTracks(N)])
-      .then(values => addTracksToPlaylist(values[0], values[1]))
-      .then(() => {
-        document.querySelector('.message').innerHTML = 'Playlist created!';
+      .then(values => {
+        addTracksToPlaylist(values[0].id, values[1]);
+        return values[0];
+      })
+      .then(data => {
+        document.querySelector('.message .text-field').innerHTML = 'Playlist created!';
+        showURL(data.external_urls.spotify)
         document.querySelector('#create-btn').style.display = 'none';
         document.querySelector('.message').style.display = 'block';
       }));
+}
+
+const showURL = url => {
+  document.querySelector('.message .url-field').innerHTML =
+    'The URL is:<br/>' + '<a href="' + url + '">' + url + '</a>';
+  document.querySelector('.message').style.display = 'block';
 }
